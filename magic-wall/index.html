@@ -8,9 +8,8 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <link rel="manifest" href="manifest.webmanifest" />
   <title>Kimmy AR Magic Wall</title>
-  <link rel="stylesheet" href="app.css?v=6" />
+  <link rel="stylesheet" href="app.css?v=7" />
   <style>
-    /* Hard override: projection content must have NO visible frame. */
     #wall,
     #wall.locked,
     #content,
@@ -21,9 +20,7 @@
       box-shadow: none !important;
       border-radius: 0 !important;
     }
-    #wall {
-      background: transparent !important;
-    }
+    #wall { background: transparent !important; }
     #wall::before,
     #wall::after,
     #content::before,
@@ -39,12 +36,12 @@
       <div class="orb"></div>
       <h1>Kimmy AR Magic Wall</h1>
       <p>Turn your phone camera into a magical virtual wall display.</p>
-      <div class="note"><strong>Easy mode:</strong> tap START once, allow the camera, then simply aim at the wall. Magic Wall will anchor itself automatically.</div>
+      <div class="note"><strong>Easy mode:</strong> tap START once, allow the camera, choose a video, then simply aim at the wall. Magic Wall will place and steady it automatically.</div>
       <div class="stack" style="margin-top:16px">
         <button id="startBtn" class="primary">START MAGIC WALL</button>
         <button id="demoBtn" class="ghost">PREVIEW WITHOUT CAMERA</button>
       </div>
-      <p class="hint">The browser may still require a one-time Camera permission. After that, no extra wall-setting tap is required.</p>
+      <p class="hint">After the video is placed, Steady Wall mode ignores small hand movements. Use RE-ANCHOR WALL only when you want to move it.</p>
     </div>
   </section>
 
@@ -79,7 +76,7 @@
         <button id="mirrorBtn" class="ghost">MIRROR CAMERA</button>
         <button id="voiceBtn" class="ghost">VOICE COMMANDS</button>
       </div>
-      <p class="hint">Automatic wall mode starts after START MAGIC WALL. Use RE-ANCHOR WALL only if you want to move the projection to a different wall.</p>
+      <p class="hint">Steady Wall locks the selected video after automatic placement so small hand movements do not make it drift.</p>
     </section>
 
     <div id="dock">
@@ -109,8 +106,9 @@
     <div id="toast"></div>
   </main>
 
-<script src="app.js?v=6"></script>
-<script src="camera-fix.js?v=6"></script>
-<script src="wall-anchor.js?v=6"></script>
+<script src="app.js?v=7"></script>
+<script src="camera-fix.js?v=7"></script>
+<script src="wall-anchor.js?v=7"></script>
+<script src="steady-wall.js?v=7"></script>
 </body>
 </html>
