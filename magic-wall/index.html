@@ -8,7 +8,7 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <link rel="manifest" href="manifest.webmanifest" />
   <title>Kimmy AR Magic Wall</title>
-  <link rel="stylesheet" href="app.css" />
+  <link rel="stylesheet" href="app.css?v=2" />
 </head>
 <body>
   <section id="welcome" class="screen">
@@ -33,6 +33,7 @@
       <div id="cameraStatus" class="status-pill">Camera off</div>
       <div id="modeStatus" class="status-pill">Ready</div>
       <div id="topActions">
+        <button id="switchCameraBtn" class="iconBtn" aria-label="Switch camera" title="Switch camera">↺</button>
         <button id="fullscreenBtn" class="iconBtn" aria-label="Full screen">⛶</button>
         <button id="menuBtn" class="iconBtn" aria-label="Tools">☰</button>
       </div>
@@ -48,12 +49,13 @@
         <button id="closePanel" class="iconBtn">✕</button>
       </div>
       <div class="panel-grid">
-        <button id="lockBtn" class="gold">LOCK WALL</button>
+        <button id="rearCameraBtn" class="gold">USE REAR CAMERA</button>
+        <button id="lockBtn" class="ghost">LOCK WALL</button>
         <button id="fitBtn" class="ghost">FIT: CONTAIN</button>
         <button id="mirrorBtn" class="ghost">MIRROR CAMERA</button>
         <button id="voiceBtn" class="ghost">VOICE COMMANDS</button>
       </div>
-      <p class="hint">Use the big controls below to position the wall. No precise dragging is required.</p>
+      <p class="hint">Tap USE REAR CAMERA if your phone opens the selfie camera. Use ↺ at the top to cycle through available cameras.</p>
     </section>
 
     <div id="dock">
@@ -83,6 +85,6 @@
     <div id="toast"></div>
   </main>
 
-<script src="app.js"></script>
+<script src="app.js?v=2"></script>
 </body>
 </html>
