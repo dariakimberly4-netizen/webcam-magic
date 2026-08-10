@@ -1,5 +1,5 @@
-const CACHE='kimmy-magic-wall-v7';
-const ASSETS=['./','./index.html','./app.css?v=7','./app.js?v=7','./camera-fix.js?v=7','./wall-anchor.js?v=7','./steady-wall.js?v=7','./manifest.webmanifest','./icon.svg'];
+const CACHE='kimmy-magic-wall-v8';
+const ASSETS=['./','./index.html','./app.css?v=8','./app.js?v=8','./camera-fix.js?v=8','./wall-anchor.js?v=8','./steady-wall.js?v=8','./manifest.webmanifest','./icon.svg'];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)));});
 self.addEventListener('activate',e=>e.waitUntil(Promise.all([caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))),self.clients.claim()])));
 self.addEventListener('fetch',e=>{
