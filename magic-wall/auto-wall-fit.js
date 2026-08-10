@@ -128,6 +128,7 @@
     fit(samples[0] || null);
     if (status) status.textContent = 'Wall found';
     if (modeStatus) modeStatus.textContent = 'Auto fitted';
+    window.dispatchEvent(new CustomEvent('magicwall:wall-found', { detail: { type: 'video' } }));
     window.dispatchEvent(new CustomEvent('magicwall:auto-fit-done', { detail: { type: 'video' } }));
   }
 
