@@ -8,7 +8,7 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <link rel="manifest" href="manifest.webmanifest" />
   <title>Kimmy AR Magic Wall</title>
-  <link rel="stylesheet" href="app.css?v=3" />
+  <link rel="stylesheet" href="app.css?v=4" />
 </head>
 <body>
   <section id="welcome" class="screen">
@@ -16,12 +16,12 @@
       <div class="orb"></div>
       <h1>Kimmy AR Magic Wall</h1>
       <p>Turn your phone camera into a magical virtual wall display.</p>
-      <div class="note"><strong>Important:</strong> this does not physically shine an image onto the real wall. The effect appears through your phone screen using the camera.</div>
+      <div class="note"><strong>Easy mode:</strong> tap START once, allow the camera, then simply aim at the wall. Magic Wall will anchor itself automatically.</div>
       <div class="stack" style="margin-top:16px">
         <button id="startBtn" class="primary">START MAGIC WALL</button>
         <button id="demoBtn" class="ghost">PREVIEW WITHOUT CAMERA</button>
       </div>
-      <p class="hint">For camera access, open this app from a secure HTTPS website and allow Camera permission.</p>
+      <p class="hint">The browser may still require a one-time Camera permission. After that, no extra wall-setting tap is required.</p>
     </div>
   </section>
 
@@ -49,14 +49,14 @@
         <button id="closePanel" class="iconBtn">✕</button>
       </div>
       <div class="panel-grid">
-        <button id="anchorWallBtn" class="gold">🧱 AUTO ANCHOR WALL</button>
+        <button id="anchorWallBtn" class="gold">🧱 RE-ANCHOR WALL</button>
         <button id="rearCameraBtn" class="gold">USE REAR CAMERA</button>
         <button id="lockBtn" class="ghost">LOCK WALL</button>
         <button id="fitBtn" class="ghost">FIT: CONTAIN</button>
         <button id="mirrorBtn" class="ghost">MIRROR CAMERA</button>
         <button id="voiceBtn" class="ghost">VOICE COMMANDS</button>
       </div>
-      <p class="hint">AUTO ANCHOR WALL tries real AR wall detection first. If your browser does not support it, the app switches to an assisted anchor. Tap USE REAR CAMERA if the selfie camera opens.</p>
+      <p class="hint">Automatic wall mode starts after START MAGIC WALL. Use RE-ANCHOR WALL only if you want to move the projection to a different wall.</p>
     </section>
 
     <div id="dock">
@@ -86,8 +86,8 @@
     <div id="toast"></div>
   </main>
 
-<script src="app.js?v=3"></script>
-<script src="camera-fix.js?v=3"></script>
-<script src="wall-anchor.js?v=3"></script>
+<script src="app.js?v=4"></script>
+<script src="camera-fix.js?v=4"></script>
+<script src="wall-anchor.js?v=4"></script>
 </body>
 </html>
