@@ -145,7 +145,7 @@
         reticle.style.display = 'none';
         status.textContent = 'Wall anchored';
         modeStatus.textContent = 'Automatic';
-        say('Done. The picture is anchored to the wall.');
+        say('Done. The video is set on the wall.');
       }
     } else {
       stableVerticalFrames = 0;
@@ -216,7 +216,7 @@
 
     let seconds = 3;
     modeStatus.textContent = 'Aim at wall · 3';
-    say('Just aim at the wall. No tapping needed.');
+    say('Point at the wall. I will set the video automatically.');
     countdownTimer = setInterval(() => {
       seconds -= 1;
       if (seconds > 0) modeStatus.textContent = 'Aim at wall · ' + seconds;
@@ -233,8 +233,8 @@
     reticle.style.display = 'none';
     button.textContent = '🧱 RE-ANCHOR WALL';
     status.textContent = 'Wall anchored';
-    modeStatus.textContent = 'Automatic';
-    say('Done. Magic Wall anchored itself.');
+    modeStatus.textContent = 'Video set';
+    say('Done. The video is set on the wall.');
   }
 
   function stopFallback() {
@@ -262,6 +262,28 @@
       }
     }, 300);
   }
+
+  function reanchorSelectedVideo() {
+    if (xrSession) {
+      anchorPoint = null;
+      stableVerticalFrames = 0;
+      reticle.style.display = 'block';
+      status.textContent = 'AR scanning';
+      modeStatus.textContent = 'Aim at wall';
+      say('Video selected. Point at the wall and I will set it automatically.');
+      return;
+    }
+
+    if (fallbackActive) stopFallback();
+    setTimeout(() => startFallback(true), 120);
+  }
+
+  // When a video is chosen, automatically start a fresh wall placement.
+  window.addEventListener('magicwall:content-ready', (event) => {
+    if (event.detail && event.detail.type === 'video') {
+      reanchorSelectedVideo();
+    }
+  });
 
   if (startBtn) {
     startBtn.addEventListener('click', () => {
