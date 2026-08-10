@@ -4,6 +4,7 @@
   const status = document.getElementById('cameraStatus');
   const modeStatus = document.getElementById('modeStatus');
   const button = document.getElementById('anchorWallBtn');
+  const startBtn = document.getElementById('startBtn');
   const toast = document.getElementById('toast');
   if (!wall || !button) return;
 
@@ -17,12 +18,14 @@
   let fallbackActive = false;
   let fallbackOrigin = null;
   let lastOrientation = null;
+  let autoTimer = null;
+  let countdownTimer = null;
 
   const reticle = document.createElement('div');
   reticle.id = 'wallReticle';
   reticle.innerHTML = '<span></span>';
-  reticle.style.cssText = 'position:fixed;left:50%;top:42%;width:74px;height:74px;transform:translate(-50%,-50%);border:3px solid rgba(244,213,141,.95);border-radius:50%;z-index:28;pointer-events:none;display:none;box-shadow:0 0 22px rgba(244,213,141,.55)';
-  reticle.firstElementChild.style.cssText = 'position:absolute;left:50%;top:50%;width:12px;height:12px;transform:translate(-50%,-50%);background:#f4d58d;border-radius:50%;box-shadow:0 0 14px #f4d58d';
+  reticle.style.cssText = 'position:fixed;left:50%;top:42%;width:86px;height:86px;transform:translate(-50%,-50%);border:4px solid rgba(244,213,141,.98);border-radius:50%;z-index:28;pointer-events:none;display:none;box-shadow:0 0 24px rgba(244,213,141,.65)';
+  reticle.firstElementChild.style.cssText = 'position:absolute;left:50%;top:50%;width:14px;height:14px;transform:translate(-50%,-50%);background:#f4d58d;border-radius:50%;box-shadow:0 0 16px #f4d58d';
   document.body.appendChild(reticle);
 
   function say(message) {
@@ -30,7 +33,7 @@
     toast.textContent = message;
     toast.classList.add('show');
     clearTimeout(say.t);
-    say.t = setTimeout(() => toast.classList.remove('show'), 2600);
+    say.t = setTimeout(() => toast.classList.remove('show'), 3000);
   }
 
   function matVec(m, v) {
@@ -48,9 +51,7 @@
   }
 
   function normalYFromQuaternion(q) {
-    // Rotate local +Y by the hit pose quaternion. For the WebXR hit-test pose,
-    // local Y is the surface normal. A wall has a mostly horizontal normal.
-    const x = q.x, y = q.y, z = q.z, w = q.w;
+    const x = q.x, z = q.z;
     return 1 - 2 * (x * x + z * z);
   }
 
@@ -61,17 +62,13 @@
     const viewP = matVec(viewMatrix, [anchorPoint.x, anchorPoint.y, anchorPoint.z, 1]);
     const clip = matVec(projection, viewP);
     if (!clip[3] || clip[3] <= 0) return;
-
     const ndcX = clip[0] / clip[3];
     const ndcY = clip[1] / clip[3];
     const x = (ndcX * 0.5 + 0.5) * window.innerWidth;
     const y = (1 - (ndcY * 0.5 + 0.5)) * window.innerHeight;
-
-    const viewer = view.transform.position;
-    const currentDistance = distance(viewer, anchorPoint);
+    const currentDistance = distance(view.transform.position, anchorPoint);
     const scale = Math.max(0.45, Math.min(2.3, anchorBaseDistance / currentDistance));
     const width = Math.max(180, Math.min(window.innerWidth * 0.96, anchorBaseWidth * scale));
-
     wall.style.left = x + 'px';
     wall.style.top = y + 'px';
     wall.style.width = width + 'px';
@@ -80,45 +77,39 @@
   }
 
   async function startXR() {
-    const supported = navigator.xr && await navigator.xr.isSessionSupported('immersive-ar').catch(() => false);
-    if (!supported) return false;
-
+    if (!navigator.xr) return false;
     try {
+      const supported = await navigator.xr.isSessionSupported('immersive-ar').catch(() => false);
+      if (!supported) return false;
       xrSession = await navigator.xr.requestSession('immersive-ar', {
         requiredFeatures: ['hit-test'],
         optionalFeatures: ['dom-overlay', 'local-floor'],
         domOverlay: { root: document.body }
       });
-
-      // Without DOM overlay the existing Magic Wall controls/content cannot be
-      // shown safely over the AR camera. Fall back instead of pretending.
       if (!xrSession.domOverlayState) {
         await xrSession.end();
         xrSession = null;
         return false;
       }
-
       localSpace = await xrSession.requestReferenceSpace('local');
       const viewerSpace = await xrSession.requestReferenceSpace('viewer');
       hitSource = await xrSession.requestHitTestSource({
         space: viewerSpace,
         offsetRay: new XRRay({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: -1 })
       });
-
       if (camera) camera.style.visibility = 'hidden';
       reticle.style.display = 'block';
       button.textContent = '✕ STOP WALL ANCHOR';
       status.textContent = 'AR scanning';
-      modeStatus.textContent = 'Find a wall';
+      modeStatus.textContent = 'Just aim at wall';
       stableVerticalFrames = 0;
       anchorPoint = null;
       anchorBaseWidth = Math.max(220, wall.getBoundingClientRect().width || window.innerWidth * 0.75);
-
       xrSession.addEventListener('end', cleanupXR, { once: true });
       xrSession.requestAnimationFrame(onXRFrame);
-      say('Move the phone slowly toward a wall. I will anchor when a vertical surface is stable.');
+      say('Just point at the wall. Magic Wall will anchor automatically.');
       return true;
-    } catch (e) {
+    } catch (_) {
       xrSession = null;
       return false;
     }
@@ -129,58 +120,50 @@
     xrSession.requestAnimationFrame(onXRFrame);
     const pose = frame.getViewerPose(localSpace);
     if (!pose || !pose.views.length) return;
-
     const view = pose.views[0];
     if (anchorPoint) {
       projectAnchor(view);
       return;
     }
-
     const results = hitSource ? frame.getHitTestResults(hitSource) : [];
     if (!results.length) {
       stableVerticalFrames = 0;
-      reticle.style.borderColor = 'rgba(244,213,141,.95)';
-      modeStatus.textContent = 'Scanning wall';
+      modeStatus.textContent = 'Aim at wall';
       return;
     }
-
     const hitPose = results[0].getPose(localSpace);
     if (!hitPose) return;
-    const q = hitPose.transform.orientation;
-    const isVertical = Math.abs(normalYFromQuaternion(q)) < 0.45;
-
+    const isVertical = Math.abs(normalYFromQuaternion(hitPose.transform.orientation)) < 0.5;
     if (isVertical) {
       stableVerticalFrames++;
       reticle.style.borderColor = '#86efac';
       modeStatus.textContent = 'Wall found';
-      if (stableVerticalFrames >= 10) {
+      if (stableVerticalFrames >= 8) {
         const p = hitPose.transform.position;
         anchorPoint = { x: p.x, y: p.y, z: p.z };
         anchorBaseDistance = distance(view.transform.position, anchorPoint);
         reticle.style.display = 'none';
         status.textContent = 'Wall anchored';
-        modeStatus.textContent = 'Anchored';
-        say('Wall anchored. Move your phone and the picture will stay tied to that spot.');
+        modeStatus.textContent = 'Automatic';
+        say('Done. The picture is anchored to the wall.');
       }
     } else {
       stableVerticalFrames = 0;
-      reticle.style.borderColor = 'rgba(244,213,141,.95)';
-      modeStatus.textContent = 'Aim at a wall';
+      reticle.style.borderColor = 'rgba(244,213,141,.98)';
+      modeStatus.textContent = 'Aim at wall';
     }
   }
 
   function cleanupXR() {
-    if (hitSource) {
-      try { hitSource.cancel(); } catch (_) {}
-    }
+    if (hitSource) { try { hitSource.cancel(); } catch (_) {} }
     hitSource = null;
     localSpace = null;
     anchorPoint = null;
     stableVerticalFrames = 0;
     reticle.style.display = 'none';
     if (camera) camera.style.visibility = 'visible';
-    button.textContent = '🧱 AUTO ANCHOR WALL';
-    status.textContent = 'Camera on';
+    button.textContent = '🧱 RE-ANCHOR WALL';
+    status.textContent = 'Rear camera';
     modeStatus.textContent = 'Ready';
     xrSession = null;
   }
@@ -196,51 +179,94 @@
     if (typeof e.alpha !== 'number') return;
     lastOrientation = { alpha: e.alpha, beta: e.beta || 0, gamma: e.gamma || 0 };
     if (!fallbackActive || !fallbackOrigin) return;
-
     const yaw = normalizeDelta(lastOrientation.alpha, fallbackOrigin.alpha);
     const pitch = lastOrientation.beta - fallbackOrigin.beta;
     const sensitivityX = Math.min(8, window.innerWidth / 50);
     const sensitivityY = Math.min(7, window.innerHeight / 80);
-    const x = window.innerWidth / 2 - yaw * sensitivityX;
-    const y = window.innerHeight * 0.45 + pitch * sensitivityY;
-
-    wall.style.left = x + 'px';
-    wall.style.top = y + 'px';
+    wall.style.left = (window.innerWidth / 2 - yaw * sensitivityX) + 'px';
+    wall.style.top = (window.innerHeight * 0.45 + pitch * sensitivityY) + 'px';
     wall.style.transform = 'translate(-50%,-50%)';
   }
 
-  async function startFallback() {
+  function clearAutoTimers() {
+    if (autoTimer) clearTimeout(autoTimer);
+    if (countdownTimer) clearInterval(countdownTimer);
+    autoTimer = null;
+    countdownTimer = null;
+  }
+
+  async function startFallback(auto = true) {
+    if (fallbackActive) return;
     fallbackActive = true;
-    button.textContent = '✓ SET WALL HERE';
+    fallbackOrigin = null;
     reticle.style.display = 'block';
-    status.textContent = 'Anchor assist';
+    button.textContent = '✕ STOP AUTO ANCHOR';
+    status.textContent = 'Auto wall';
     modeStatus.textContent = 'Aim at wall';
 
     if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
       try { await DeviceOrientationEvent.requestPermission(); } catch (_) {}
     }
     window.addEventListener('deviceorientation', onOrientation, true);
-    say('AR wall detection is not available here. Aim at the wall, then tap SET WALL HERE.');
+
+    if (!auto) {
+      say('Aim at the wall. Magic Wall will anchor automatically.');
+      return;
+    }
+
+    let seconds = 3;
+    modeStatus.textContent = 'Aim at wall · 3';
+    say('Just aim at the wall. No tapping needed.');
+    countdownTimer = setInterval(() => {
+      seconds -= 1;
+      if (seconds > 0) modeStatus.textContent = 'Aim at wall · ' + seconds;
+    }, 1000);
+    autoTimer = setTimeout(() => {
+      setFallbackAnchor();
+    }, 3000);
   }
 
   function setFallbackAnchor() {
+    if (!fallbackActive || fallbackOrigin) return;
+    clearAutoTimers();
     fallbackOrigin = lastOrientation || { alpha: 0, beta: 0, gamma: 0 };
     reticle.style.display = 'none';
-    button.textContent = '✕ STOP WALL ANCHOR';
+    button.textContent = '🧱 RE-ANCHOR WALL';
     status.textContent = 'Wall anchored';
-    modeStatus.textContent = 'Assisted anchor';
-    say('Wall position saved. This phone is using assisted tracking, not true AR plane detection.');
+    modeStatus.textContent = 'Automatic';
+    say('Done. Magic Wall anchored itself.');
   }
 
   function stopFallback() {
+    clearAutoTimers();
     fallbackActive = false;
     fallbackOrigin = null;
     lastOrientation = null;
     window.removeEventListener('deviceorientation', onOrientation, true);
     reticle.style.display = 'none';
-    button.textContent = '🧱 AUTO ANCHOR WALL';
-    status.textContent = 'Camera on';
+    button.textContent = '🧱 RE-ANCHOR WALL';
+    status.textContent = 'Rear camera';
     modeStatus.textContent = 'Ready';
+  }
+
+  function waitForCameraThenAutoAnchor() {
+    let tries = 0;
+    const watcher = setInterval(() => {
+      tries++;
+      const text = (status.textContent || '').toLowerCase();
+      if (text.includes('rear camera') || text.includes('camera on')) {
+        clearInterval(watcher);
+        if (!xrSession && !fallbackActive) startFallback(true);
+      } else if (tries > 50) {
+        clearInterval(watcher);
+      }
+    }, 300);
+  }
+
+  if (startBtn) {
+    startBtn.addEventListener('click', () => {
+      waitForCameraThenAutoAnchor();
+    });
   }
 
   button.addEventListener('click', async () => {
@@ -248,19 +274,15 @@
       await xrSession.end();
       return;
     }
-    if (fallbackActive && !fallbackOrigin) {
-      setFallbackAnchor();
-      return;
-    }
     if (fallbackActive) {
       stopFallback();
+      setTimeout(() => startFallback(true), 150);
       return;
     }
-
     button.disabled = true;
     button.textContent = 'CHECKING AR…';
     const started = await startXR();
     button.disabled = false;
-    if (!started) await startFallback();
+    if (!started) await startFallback(true);
   });
 })();
