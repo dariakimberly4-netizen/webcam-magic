@@ -8,8 +8,30 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <link rel="manifest" href="manifest.webmanifest" />
   <title>Kimmy AR Magic Wall</title>
-  <link rel="stylesheet" href="app.css?v=4" />
-  <link rel="stylesheet" href="no-gold-frame.css?v=1" />
+  <link rel="stylesheet" href="app.css?v=6" />
+  <style>
+    /* Hard override: projection content must have NO visible frame. */
+    #wall,
+    #wall.locked,
+    #content,
+    #content img,
+    #content video {
+      border: 0 !important;
+      outline: 0 !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+    }
+    #wall {
+      background: transparent !important;
+    }
+    #wall::before,
+    #wall::after,
+    #content::before,
+    #content::after {
+      content: none !important;
+      display: none !important;
+    }
+  </style>
 </head>
 <body>
   <section id="welcome" class="screen">
@@ -87,8 +109,8 @@
     <div id="toast"></div>
   </main>
 
-<script src="app.js?v=4"></script>
-<script src="camera-fix.js?v=4"></script>
-<script src="wall-anchor.js?v=4"></script>
+<script src="app.js?v=6"></script>
+<script src="camera-fix.js?v=6"></script>
+<script src="wall-anchor.js?v=6"></script>
 </body>
 </html>
