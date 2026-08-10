@@ -8,7 +8,7 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <link rel="manifest" href="manifest.webmanifest" />
   <title>Kimmy AR Magic Wall</title>
-  <link rel="stylesheet" href="app.css?v=8" />
+  <link rel="stylesheet" href="app.css?v=9" />
   <style>
     #wall,
     #wall.locked,
@@ -36,12 +36,12 @@
       <div class="orb"></div>
       <h1>Kimmy AR Magic Wall</h1>
       <p>Turn your phone camera into a magical virtual wall display.</p>
-      <div class="note"><strong>One-tap mode:</strong> tap START once, allow the camera, choose a video, then point at the wall. Magic Wall places it, steadies it, and starts playing automatically.</div>
+      <div class="note"><strong>One-tap mode:</strong> tap START once, allow the camera, choose a video, then point at the wall. Magic Wall centers it, steadies it, and starts playing automatically.</div>
       <div class="stack" style="margin-top:16px">
         <button id="startBtn" class="primary">START MAGIC WALL</button>
         <button id="demoBtn" class="ghost">PREVIEW WITHOUT CAMERA</button>
       </div>
-      <p class="hint">No separate Set Wall or Play tap is needed after choosing the video. If Android blocks autoplay with sound, Magic Wall starts the video muted automatically.</p>
+      <p class="hint">The rear camera stays visible. No separate Set Wall or Play tap is needed after choosing the video.</p>
     </div>
   </section>
 
@@ -76,7 +76,7 @@
         <button id="mirrorBtn" class="ghost">MIRROR CAMERA</button>
         <button id="voiceBtn" class="ghost">VOICE COMMANDS</button>
       </div>
-      <p class="hint">Automatic projection begins after you choose a video and aim at the wall. Use RE-ANCHOR WALL only when you intentionally want to move it.</p>
+      <p class="hint">Choose a video, point at the wall, and hold for 3 seconds. Magic Wall centers and fixes it automatically.</p>
     </section>
 
     <div id="dock">
@@ -106,9 +106,9 @@
     <div id="toast"></div>
   </main>
 
-<script src="app.js?v=8"></script>
-<script src="camera-fix.js?v=8"></script>
-<script src="wall-anchor.js?v=8"></script>
-<script src="steady-wall.js?v=8"></script>
+<script src="app.js?v=9"></script>
+<script src="camera-fix.js?v=9"></script>
+<script src="wall-anchor.js?v=9"></script>
+<script src="steady-wall.js?v=9"></script>
 </body>
 </html>
