@@ -100,9 +100,21 @@
     video.src = fileUrl(file);
     video.playsInline = true;
     video.loop = true;
+    video.autoplay = true;
     content.appendChild(video);
     currentVideo = video;
+    modeStatus.textContent = 'Video ready';
     video.play().catch(() => {});
+
+    // Selecting a video starts a fresh automatic wall placement. The user only
+    // needs to aim the rear camera at the wall; no separate wall-setting tap.
+    const triggerAutoPlacement = () => {
+      window.dispatchEvent(new CustomEvent('magicwall:content-ready', {
+        detail: { type: 'video' }
+      }));
+    };
+    if (video.readyState >= 2) triggerAutoPlacement();
+    else video.addEventListener('loadeddata', triggerAutoPlacement, { once: true });
   }
 
   function galaxy() {
