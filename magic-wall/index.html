@@ -8,7 +8,7 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <link rel="manifest" href="manifest.webmanifest" />
   <title>Kimmy AR Magic Wall</title>
-  <link rel="stylesheet" href="app.css?v=2" />
+  <link rel="stylesheet" href="app.css?v=3" />
 </head>
 <body>
   <section id="welcome" class="screen">
@@ -49,13 +49,14 @@
         <button id="closePanel" class="iconBtn">✕</button>
       </div>
       <div class="panel-grid">
+        <button id="anchorWallBtn" class="gold">🧱 AUTO ANCHOR WALL</button>
         <button id="rearCameraBtn" class="gold">USE REAR CAMERA</button>
         <button id="lockBtn" class="ghost">LOCK WALL</button>
         <button id="fitBtn" class="ghost">FIT: CONTAIN</button>
         <button id="mirrorBtn" class="ghost">MIRROR CAMERA</button>
         <button id="voiceBtn" class="ghost">VOICE COMMANDS</button>
       </div>
-      <p class="hint">Tap USE REAR CAMERA if your phone opens the selfie camera. Use ↺ at the top to cycle through available cameras.</p>
+      <p class="hint">AUTO ANCHOR WALL tries real AR wall detection first. If your browser does not support it, the app switches to an assisted anchor. Tap USE REAR CAMERA if the selfie camera opens.</p>
     </section>
 
     <div id="dock">
@@ -85,7 +86,8 @@
     <div id="toast"></div>
   </main>
 
-<script src="app.js?v=2"></script>
-<script src="camera-fix.js?v=2"></script>
+<script src="app.js?v=3"></script>
+<script src="camera-fix.js?v=3"></script>
+<script src="wall-anchor.js?v=3"></script>
 </body>
 </html>
