@@ -1,0 +1,17 @@
+{
+  "name": "Kimmy AR Magic Wall",
+  "short_name": "Magic Wall",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#120b27",
+  "theme_color": "#24103f",
+  "description": "A phone-only AR-style magic wall using the rear camera and virtual overlays.",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
