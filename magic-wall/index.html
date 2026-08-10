@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
+  <meta name="theme-color" content="#24103f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <title>Kimmy AR Magic Wall</title>
+  <link rel="stylesheet" href="app.css" />
+</head>
+<body>
+  <section id="welcome" class="screen">
+    <div class="welcome-card">
+      <div class="orb"></div>
+      <h1>Kimmy AR Magic Wall</h1>
+      <p>Turn your phone camera into a magical virtual wall display.</p>
+      <div class="note"><strong>Important:</strong> this does not physically shine an image onto the real wall. The effect appears through your phone screen using the camera.</div>
+      <div class="stack" style="margin-top:16px">
+        <button id="startBtn" class="primary">START MAGIC WALL</button>
+        <button id="demoBtn" class="ghost">PREVIEW WITHOUT CAMERA</button>
+      </div>
+      <p class="hint">For camera access, open this app from a secure HTTPS website and allow Camera permission.</p>
+    </div>
+  </section>
+
+  <main id="app" class="screen">
+    <video id="camera" playsinline autoplay muted></video>
+    <div id="shade"></div>
+
+    <div id="status">
+      <div id="cameraStatus" class="status-pill">Camera off</div>
+      <div id="modeStatus" class="status-pill">Ready</div>
+      <div id="topActions">
+        <button id="fullscreenBtn" class="iconBtn" aria-label="Full screen">⛶</button>
+        <button id="menuBtn" class="iconBtn" aria-label="Tools">☰</button>
+      </div>
+    </div>
+
+    <div id="wall">
+      <div id="content"></div>
+    </div>
+
+    <section id="panel">
+      <div class="panel-title">
+        <h2>Wall Tools</h2>
+        <button id="closePanel" class="iconBtn">✕</button>
+      </div>
+      <div class="panel-grid">
+        <button id="lockBtn" class="gold">LOCK WALL</button>
+        <button id="fitBtn" class="ghost">FIT: CONTAIN</button>
+        <button id="mirrorBtn" class="ghost">MIRROR CAMERA</button>
+        <button id="voiceBtn" class="ghost">VOICE COMMANDS</button>
+      </div>
+      <p class="hint">Use the big controls below to position the wall. No precise dragging is required.</p>
+    </section>
+
+    <div id="dock">
+      <div class="mode-row">
+        <button class="mode" data-mode="photo">📷 Photo</button>
+        <button class="mode" data-mode="video">🎬 Video</button>
+        <button class="mode" data-mode="butterflies">🦋 Butterflies</button>
+        <button class="mode" data-mode="galaxy">✨ Galaxy</button>
+        <button class="mode" data-mode="flowers">🌸 Flowers</button>
+        <button class="mode" data-mode="affirmation">💜 Affirmation</button>
+        <button class="mode" data-mode="memories">🖼️ Memories</button>
+        <button class="mode" data-mode="presentation">📑 Slides</button>
+        <button class="mode" data-mode="portal">🌀 Portal</button>
+      </div>
+      <div class="control-grid">
+        <button data-move="up">▲ UP</button>
+        <button data-scale="up">＋ BIG</button>
+        <button data-scale="down">− SMALL</button>
+        <button data-move="down">▼ DOWN</button>
+        <button data-move="left">◀ LEFT</button>
+        <button id="centerBtn">◎ CENTER</button>
+        <button id="playBtn">▶ PLAY</button>
+        <button data-move="right">RIGHT ▶</button>
+      </div>
+    </div>
+
+    <div id="toast"></div>
+  </main>
+
+<script src="app.js"></script>
+</body>
+</html>
