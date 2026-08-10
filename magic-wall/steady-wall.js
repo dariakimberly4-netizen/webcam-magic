@@ -18,6 +18,31 @@
     say.t = setTimeout(() => toast.classList.remove('show'), 2400);
   }
 
+  async function autoPlayVideo() {
+    const video = document.querySelector('#content video');
+    if (!video) return;
+    video.autoplay = true;
+    video.playsInline = true;
+    video.loop = true;
+
+    try {
+      await video.play();
+      if (modeStatus) modeStatus.textContent = 'Auto projecting';
+      return;
+    } catch (_) {}
+
+    // Some Android browsers block delayed autoplay with sound. Keep the
+    // experience one-tap by falling back to muted playback automatically.
+    try {
+      video.muted = true;
+      await video.play();
+      if (modeStatus) modeStatus.textContent = 'Auto projecting';
+      say('Video started automatically. Your browser muted it for autoplay.');
+    } catch (_) {
+      if (modeStatus) modeStatus.textContent = 'Video ready';
+    }
+  }
+
   function capturePosition() {
     const r = wall.getBoundingClientRect();
     saved = {
@@ -44,8 +69,9 @@
     if (raf) cancelAnimationFrame(raf);
     raf = requestAnimationFrame(applySaved);
     if (status) status.textContent = 'Steady wall';
-    if (modeStatus) modeStatus.textContent = 'Video fixed';
-    say('Steady Wall is on. Small hand movements will not move the video.');
+    if (modeStatus) modeStatus.textContent = 'Auto projecting';
+    autoPlayVideo();
+    say('Video fixed on the wall and playing automatically.');
   }
 
   function unlockSteady() {
@@ -55,15 +81,16 @@
     raf = null;
   }
 
-  // When a video is selected, wait for auto-placement to finish, then freeze it.
+  // Choosing a video starts playback immediately, then auto-placement freezes
+  // the wall after it settles. No separate Play or Set Wall tap is required.
   window.addEventListener('magicwall:content-ready', (event) => {
     if (!event.detail || event.detail.type !== 'video') return;
     unlockSteady();
+    autoPlayVideo();
     clearTimeout(settleTimer);
     settleTimer = setTimeout(lockSteady, 3400);
   });
 
-  // Re-anchoring intentionally unlocks the wall, then re-locks after the new position settles.
   const reanchor = document.getElementById('anchorWallBtn');
   if (reanchor) {
     reanchor.addEventListener('click', () => {
@@ -73,7 +100,6 @@
     });
   }
 
-  // Manual position controls should still work. Re-freeze after the tap.
   document.addEventListener('click', (e) => {
     const button = e.target.closest('[data-move],[data-scale],#centerBtn');
     if (!button) return;
