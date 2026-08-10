@@ -8,7 +8,7 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <link rel="manifest" href="manifest.webmanifest" />
   <title>Kimmy AR Magic Wall</title>
-  <link rel="stylesheet" href="app.css?v=9" />
+  <link rel="stylesheet" href="app.css?v=10" />
   <style>
     #wall,
     #wall.locked,
@@ -36,12 +36,12 @@
       <div class="orb"></div>
       <h1>Kimmy AR Magic Wall</h1>
       <p>Turn your phone camera into a magical virtual wall display.</p>
-      <div class="note"><strong>One-tap mode:</strong> tap START once, allow the camera, choose a video, then point at the wall. Magic Wall centers it, steadies it, and starts playing automatically.</div>
+      <div class="note"><strong>Automatic wall mode:</strong> tap START once, allow the camera, choose a video, then point at a wall. Magic Wall finds the flattest wall area, places the video there, steadies it, and starts playing automatically.</div>
       <div class="stack" style="margin-top:16px">
         <button id="startBtn" class="primary">START MAGIC WALL</button>
         <button id="demoBtn" class="ghost">PREVIEW WITHOUT CAMERA</button>
       </div>
-      <p class="hint">The rear camera stays visible. No separate Set Wall or Play tap is needed after choosing the video.</p>
+      <p class="hint">No Set Wall, Center, or Play tap is required after choosing the video.</p>
     </div>
   </section>
 
@@ -69,14 +69,14 @@
         <button id="closePanel" class="iconBtn">✕</button>
       </div>
       <div class="panel-grid">
-        <button id="anchorWallBtn" class="gold">🧱 RE-ANCHOR WALL</button>
+        <button id="anchorWallBtn" class="gold">🧱 FIND WALL AGAIN</button>
         <button id="rearCameraBtn" class="gold">USE REAR CAMERA</button>
         <button id="lockBtn" class="ghost">LOCK WALL</button>
         <button id="fitBtn" class="ghost">FIT: CONTAIN</button>
         <button id="mirrorBtn" class="ghost">MIRROR CAMERA</button>
         <button id="voiceBtn" class="ghost">VOICE COMMANDS</button>
       </div>
-      <p class="hint">Choose a video, point at the wall, and hold for 3 seconds. Magic Wall centers and fixes it automatically.</p>
+      <p class="hint">After choosing a video, just point the rear camera at the wall and hold it generally toward the wall for a moment. The app chooses the wall area automatically.</p>
     </section>
 
     <div id="dock">
@@ -106,9 +106,9 @@
     <div id="toast"></div>
   </main>
 
-<script src="app.js?v=9"></script>
-<script src="camera-fix.js?v=9"></script>
-<script src="wall-anchor.js?v=9"></script>
-<script src="steady-wall.js?v=9"></script>
+<script src="app.js?v=10"></script>
+<script src="camera-fix.js?v=10"></script>
+<script src="auto-wall-finder.js?v=10"></script>
+<script src="steady-wall.js?v=10"></script>
 </body>
 </html>
