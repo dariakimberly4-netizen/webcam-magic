@@ -8,7 +8,6 @@
   let locked = false;
   let saved = null;
   let raf = null;
-  let settleTimer = null;
 
   function say(message) {
     if (!toast) return;
@@ -27,20 +26,14 @@
 
     try {
       await video.play();
-      if (modeStatus) modeStatus.textContent = 'Auto projecting';
       return;
     } catch (_) {}
 
-    // Some Android browsers block delayed autoplay with sound. Keep the
-    // experience one-tap by falling back to muted playback automatically.
     try {
       video.muted = true;
       await video.play();
-      if (modeStatus) modeStatus.textContent = 'Auto projecting';
       say('Video started automatically. Your browser muted it for autoplay.');
-    } catch (_) {
-      if (modeStatus) modeStatus.textContent = 'Video ready';
-    }
+    } catch (_) {}
   }
 
   function capturePosition() {
@@ -71,7 +64,7 @@
     if (status) status.textContent = 'Steady wall';
     if (modeStatus) modeStatus.textContent = 'Auto projecting';
     autoPlayVideo();
-    say('Video fixed on the wall and playing automatically.');
+    say('Wall found. Video placed, fixed, and playing automatically.');
   }
 
   function unlockSteady() {
@@ -81,29 +74,34 @@
     raf = null;
   }
 
-  // Choosing a video starts playback immediately, then auto-placement freezes
-  // the wall after it settles. No separate Play or Set Wall tap is required.
-  window.addEventListener('magicwall:content-ready', (event) => {
+  // Video selection starts playback while Auto Wall Finder decides where to put it.
+  window.addEventListener('magicwall:content-ready', event => {
     if (!event.detail || event.detail.type !== 'video') return;
     unlockSteady();
     autoPlayVideo();
-    clearTimeout(settleTimer);
-    settleTimer = setTimeout(lockSteady, 3400);
+    if (status) status.textContent = 'Finding wall';
+    if (modeStatus) modeStatus.textContent = 'Aim at wall';
+  });
+
+  // Freeze only after the camera-based wall finder has chosen the wall area.
+  window.addEventListener('magicwall:wall-found', () => {
+    unlockSteady();
+    setTimeout(lockSteady, 120);
   });
 
   const reanchor = document.getElementById('anchorWallBtn');
   if (reanchor) {
     reanchor.addEventListener('click', () => {
       unlockSteady();
-      clearTimeout(settleTimer);
-      settleTimer = setTimeout(lockSteady, 3400);
-    });
+      if (status) status.textContent = 'Finding wall';
+      if (modeStatus) modeStatus.textContent = 'Aim at wall';
+    }, true);
   }
 
-  document.addEventListener('click', (e) => {
+  // Manual controls remain optional. If used, lock again after the single tap.
+  document.addEventListener('click', e => {
     const button = e.target.closest('[data-move],[data-scale],#centerBtn');
-    if (!button) return;
-    if (!locked) return;
+    if (!button || !locked) return;
     unlockSteady();
     setTimeout(lockSteady, 120);
   }, true);
